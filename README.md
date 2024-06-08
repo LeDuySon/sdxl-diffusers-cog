@@ -7,16 +7,22 @@ Follow the [model pushing guide](https://replicate.com/docs/guides/push-a-model)
 
 ## Basic Usage
 
-for prediction,
+- for prediction in local,
 
 ```bash
 cog predict -i prompt="a photo of TOK"
 ```
 
 ```bash
-cog train -i input_images=@example_datasets/__data.zip -i use_face_detection_instead=True
+cog run -p 5000 python -m cog.server.http
 ```
 
-```bash
-cog run -p 5000 python -m cog.server.http
+- Build and push to replicate 
+```
+cog build -t cog-sdxl:v1.0.0
+```
+
+- Push to replicate (You need to create a model in replicate https://replicate.com/create)
+```
+cog push {MODEL_REPLICATE_URL}
 ```
