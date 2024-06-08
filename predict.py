@@ -203,7 +203,7 @@ class Predictor(BasePredictor):
         ),
         lora_id: str = Input(
             description="Path to the lora model on huggingface. Leave blank to use the default weights.",
-            default="",
+            default=DEFAULT_LORA_MODEL,
         ),
     ) -> List[Path]:
         """Run a single prediction on the model."""
