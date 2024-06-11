@@ -46,12 +46,27 @@ class KarrasDPM:
 SCHEDULERS = {
     "DDIM": DDIMScheduler,
     "DPMSolverMultistep": DPMSolverMultistepScheduler,
+    "DPMPP_2M_SDE": DPMSolverMultistepScheduler,
+    "DPMPP_2M_SDE_KARRAS": DPMSolverMultistepScheduler,
+    "DPMPP_2M_KARRAS": DPMSolverMultistepScheduler,
     "HeunDiscrete": HeunDiscreteScheduler,
     "KarrasDPM": KarrasDPM,
     "K_EULER_ANCESTRAL": EulerAncestralDiscreteScheduler,
     "K_EULER": EulerDiscreteScheduler,
     "PNDM": PNDMScheduler,
 }
+
+def get_scheduler(scheduler: str, config):
+    if(scheduler == "DPMPP_2M_SDE"):
+        return SCHEDULERS[scheduler].from_config(config, algorithm_type="sde-dpmsolver++")
+    elif(scheduler == "DPMPP_2M_SDE_KARRAS"):
+        return SCHEDULERS[scheduler].from_config(config,
+                                                 algorithm_type="sde-dpmsolver++", 
+                                                 use_karras_sigmas=True)
+    elif(scheduler == "DPMPP_2M_KARRAS"):
+        return SCHEDULERS[scheduler].from_config(config, use_karras_sigmas=True)
+    else:
+        return SCHEDULERS[scheduler].from_config(config)
 
 class Predictor(BasePredictor):
     def load_lora_adapter(self, lora_id: str, pipe):
@@ -243,7 +258,7 @@ class Predictor(BasePredictor):
             pipe.watermark = None
 
         print(f"Setting up scheduler {scheduler}")
-        pipe.scheduler = SCHEDULERS[scheduler].from_config(pipe.scheduler.config)
+        pipe.scheduler = get_scheduler(scheduler, pipe.scheduler.config)
         generator = torch.Generator("cuda").manual_seed(seed)
 
         common_args = {
